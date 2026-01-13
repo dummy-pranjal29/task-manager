@@ -11,13 +11,18 @@ const signupSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    console.log("Signup attempt started");
     const body = await request.json();
+    console.log("Body parsed:", { name: body.name, email: body.email });
     const { name, email, password } = signupSchema.parse(body);
+    console.log("Validation passed");
 
     // Check if user already exists
+    console.log("Checking for existing user...");
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
+    console.log("Existing user check done:", !!existingUser);
 
     if (existingUser) {
       return NextResponse.json(
@@ -30,6 +35,7 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Create user
+    console.log("Creating user...");
     const user = await prisma.user.create({
       data: {
         name,
@@ -43,15 +49,17 @@ export async function POST(request: NextRequest) {
         createdAt: true,
       },
     });
+    console.log("User created:", user.id);
 
     return NextResponse.json(
       { message: "User created successfully", user },
       { status: 201 }
     );
   } catch (error) {
+    console.log("Signup error:", error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: error.errors[0]?.message || "Validation error" },
+        { error: error.issues[0]?.message || "Validation error" },
         { status: 400 }
       );
     }
