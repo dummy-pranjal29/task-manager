@@ -9,11 +9,8 @@ import {
   useSensor,
   useSensors,
   closestCorners,
+  useDroppable,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
 import { useState } from "react";
 import { TaskCard } from "./TaskCard";
 import { createPortal } from "react-dom";
@@ -41,9 +38,24 @@ interface ColumnProps {
   onDeleteTask: (taskId: string) => void;
 }
 
-function Column({ title, tasks, onEditTask, onDeleteTask }: ColumnProps) {
+function Column({
+  title,
+  tasks,
+  status,
+  onEditTask,
+  onDeleteTask,
+}: ColumnProps) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: status,
+  });
+
   return (
-    <div className="bg-gray-50 rounded-lg p-4 min-h-[400px]">
+    <div
+      ref={setNodeRef}
+      className={`bg-gray-50 rounded-lg p-4 min-h-[400px] ${
+        isOver ? "ring-2 ring-blue-400 bg-blue-50" : ""
+      }`}
+    >
       <h2 className="font-semibold text-gray-700 mb-4 flex items-center justify-between">
         {title}
         <span className="bg-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full">
