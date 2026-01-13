@@ -37,7 +37,12 @@ export default function LoginPage() {
   };
 
   const handleOAuthSignIn = (provider: string) => {
-    signIn(provider, { callbackUrl: "/dashboard" });
+    console.log(`Initiating ${provider} sign-in...`);
+    try {
+      signIn(provider, { callbackUrl: "/dashboard" });
+    } catch (error) {
+      console.error("Sign-in error:", error);
+    }
   };
 
   return (
