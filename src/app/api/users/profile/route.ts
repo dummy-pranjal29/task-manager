@@ -61,6 +61,12 @@ export async function PUT(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        password: true,
+      },
     });
 
     if (!user) {
@@ -81,10 +87,10 @@ export async function PUT(request: NextRequest) {
         );
       }
 
-      const isPasswordValid = await bcrypt.compare(
-        currentPassword,
-        user.password
-      );
+      let isPasswordValid = false;
+      if (user.password) {
+        isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      }
 
       if (!isPasswordValid) {
         return NextResponse.json(
